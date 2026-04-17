@@ -16,8 +16,8 @@ PROVIDERS = {
     },
     "Google Gemini": {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
-        "models": ["gemini-2.0-flash", "gemini-2.0-pro", "gemini-1.5-pro", "gemini-1.5-flash"],
-        "default": "gemini-2.0-flash",
+        "models": ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash-lite"],
+        "default": "gemini-3.1-flash-lite-preview",
         "key_help": "Get a key at https://aistudio.google.com/apikey",
         "json_mode": True,
     },

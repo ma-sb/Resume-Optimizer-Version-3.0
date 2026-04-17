@@ -301,21 +301,21 @@ with st.sidebar:
     )
     active_model = st.selectbox("Model", provider["models"], index=0, key="model")
 
-    if not saved_key:
-        st.divider()
-        st.markdown("**Save your API keys**")
-        st.markdown(
-            "Create a file at\n"
-            "`Your_Project_Folder/.streamlit/secrets.toml`\n"
-            "with this content:"
-        )
-        st.code(
-            'api_key = "your-llm-key"\n'
-            'adzuna_app_id = "your-adzuna-id"\n'
-            'adzuna_app_key = "your-adzuna-key"',
-            language="toml",
-        )
-        st.caption("Keys stay on your machine and are never uploaded.")
+    # if not saved_key:
+    #     st.divider()
+    #     st.markdown("**Save your API keys**")
+    #     st.markdown(
+    #         "Create a file at\n"
+    #         "`Your_Project_Folder/.streamlit/secrets.toml`\n"
+    #         "with this content:"
+    #     )
+    #     st.code(
+    #         'api_key = "your-llm-key"\n'
+    #         'adzuna_app_id = "your-adzuna-id"\n'
+    #         'adzuna_app_key = "your-adzuna-key"',
+    #         language="toml",
+    #     )
+    #     st.caption("Keys stay on your machine and are never uploaded.")
 
     st.divider()
     st.markdown("**Job Search**")
