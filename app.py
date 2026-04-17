@@ -353,9 +353,11 @@ json_mode = provider["json_mode"]
 st.subheader("1 — Job Description", help=STEP_TOOLTIPS[1])
 
 with st.expander("Search for a job", expanded=False):
-    col_pos, col_num, col_sort = st.columns([3, 1, 1])
+    col_pos, col_loc, col_num, col_sort = st.columns([2, 2, 1, 1.5])
     with col_pos:
         search_position = st.text_input("Job position", placeholder='e.g. "Data Scientist"', key="search_position")
+    with col_loc:
+        search_location = st.text_input("Location", value="united states", key="search_location")
     with col_num:
         search_num = st.number_input("Results", min_value=1, max_value=20, value=5, key="search_num")
     with col_sort:
@@ -375,6 +377,7 @@ with st.expander("Search for a job", expanded=False):
                 results = fetch_jobs(
                     search_position,
                     num_results=search_num,
+                    location=search_location,
                     sort_by=search_sort,
                     app_id=adzuna_app_id,
                     app_key=adzuna_app_key,
