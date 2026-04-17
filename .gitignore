@@ -1,0 +1,13 @@
+# Credentials
+.streamlit/secrets.toml
+env_vars.env
+
+# macOS system files
+.DS_Store
+
+# R history
+.Rhistory
+
+# Python bytecode
+__pycache__/
+*.pyc
