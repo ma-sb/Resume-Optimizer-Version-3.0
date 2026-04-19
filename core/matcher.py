@@ -177,7 +177,9 @@ def _parse_json(text: str) -> dict:
     cleaned = re.sub(r"^```(?:json)?\s*\n?", "", text.strip())
     cleaned = re.sub(r"\n?```\s*$", "", cleaned)
     cleaned = re.sub(r"[\x00-\x09\x0b\x0c\x0e-\x1f]", " ", cleaned)
-    return json.loads(cleaned)
+    start = cleaned.index("{")
+    obj, _ = json.JSONDecoder().raw_decode(cleaned[start:])
+    return obj
 
 
 def _call(
