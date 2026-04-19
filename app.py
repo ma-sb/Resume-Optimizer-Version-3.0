@@ -1,13 +1,12 @@
 """Resume Polisher – Streamlit application."""
 
-import base64
 import streamlit as st
 from pathlib import Path
 
 from JobFetch import fetch_jobs
 from core.reader import load_resumes, read_docx_from_bytes, Resume
 from core.matcher import PROVIDERS, match_resumes, get_improvements, optimize_resume
-from core.exporter import export, export_docx, _convert_to_pdf
+from core.exporter import export_docx, _convert_to_pdf
 
 RESUMES_DIR = Path(__file__).parent / "resumes"
 OUTPUT_DIR = Path(__file__).parent / "output"
@@ -631,12 +630,6 @@ if optimize_btn and selected_resume:
             st.session_state["optimized"] = optimized
             st.session_state["optimized_source_resume"] = selected_resume
             st.session_state["export_approved"] = False
-
-            if selected_resume.raw_bytes:
-                preview_docx = export_docx(selected_resume.raw_bytes, optimized, OUTPUT_DIR, "Preview")
-                preview_pdf = _convert_to_pdf(preview_docx)
-                st.session_state["preview_docx_path"] = preview_docx
-                st.session_state["preview_pdf_path"] = preview_pdf
         except Exception as e:
             st.error(f"Error: {e}")
 
@@ -656,36 +649,14 @@ if "optimized" in st.session_state:
         with col_summary:
             st.success(f"**Job fit:** {fit_summary}")
 
-    preview_pdf: Path | None = st.session_state.get("preview_pdf_path")
-    preview_docx: Path | None = st.session_state.get("preview_docx_path")
-
-    if preview_pdf and preview_pdf.exists():
-        pdf_bytes = preview_pdf.read_bytes()
-        b64 = base64.b64encode(pdf_bytes).decode()
-        st.markdown(
-            f'<iframe src="data:application/pdf;base64,{b64}" '
-            f'width="100%" height="700" style="border: 1px solid #e2e8f0; border-radius: 8px;"></iframe>',
-            unsafe_allow_html=True,
-        )
-    elif preview_docx and preview_docx.exists():
-        st.info("PDF preview not available (LibreOffice required). Showing text preview instead.")
-        with st.expander("Preview optimized resume", expanded=True):
-            st.markdown(f"### {opt.get('name', '')}")
-            for sec in opt.get("sections", []):
-                st.markdown(f"**{sec.get('heading', '')}**")
-                if sec.get("content"):
-                    st.write(sec["content"])
-                for b in sec.get("bullets", []):
-                    st.markdown(f"- {b}")
-    else:
-        with st.expander("Preview optimized resume", expanded=True):
-            st.markdown(f"### {opt.get('name', '')}")
-            for sec in opt.get("sections", []):
-                st.markdown(f"**{sec.get('heading', '')}**")
-                if sec.get("content"):
-                    st.write(sec["content"])
-                for b in sec.get("bullets", []):
-                    st.markdown(f"- {b}")
+    with st.expander("Preview optimized resume", expanded=True):
+        st.markdown(f"### {opt.get('name', '')}")
+        for sec in opt.get("sections", []):
+            st.markdown(f"**{sec.get('heading', '')}**")
+            if sec.get("content"):
+                st.write(sec["content"])
+            for b in sec.get("bullets", []):
+                st.markdown(f"- {b}")
 
 # ── Step 6 — Export ──────────────────────────────────────────────────────────
 
