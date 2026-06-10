@@ -1,6 +1,6 @@
-# Resume Polisher
+# Resume Polisher 3.0
 
-AI-powered resume evaluation, matching, and optimization tool.
+AI-powered resume evaluation, matching, optimization, and interview copilot.
 
 ## Features
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Terminal CLI for Resume Polisher (Typer). Uses .env for GEMINI_API_KEY by default."""
+"""Terminal CLI for Resume Polisher 3.0 (Typer). Uses .env for GEMINI_API_KEY by default."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ load_dotenv(_ROOT / ".env")
 
 app = typer.Typer(
     name="resume-polisher",
-    help="Resume Polisher — match, improve, optimize, and export resumes (Gemini / .env).",
+    help="Resume Polisher 3.0 — match, improve, optimize, and export resumes (Gemini / .env).",
     no_args_is_help=True,
 )
 
