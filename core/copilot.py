@@ -33,9 +33,13 @@ If important information is missing:
 - Never make assumptions when additional information would significantly improve the answer.
 
 Response style:
+- Keep answers as short as possible while still being useful.
 - Be concise, direct, and practical.
-- When useful, structure the answer so the candidate can reuse it in interviews or resume edits.
+- Default to copy-paste-ready wording when the user asks for resume bullets, summaries, cover letter lines, motivational letter lines, or interview answers.
+- Prefer concrete recommendations over explanation.
+- When useful, structure the answer so the candidate can reuse it immediately in interviews or resume edits.
 - Explicitly tie recommendations back to evidence from the resume, job description, or company context.
+- If the user asks to change, rewrite, shorten, or improve resume text, keep the proposed wording no longer than the original resume wording unless the user explicitly asks for a longer version.
 """
 
 

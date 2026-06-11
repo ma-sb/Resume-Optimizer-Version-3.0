@@ -11,3 +11,6 @@ env_vars.env
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Generated exports
+output/

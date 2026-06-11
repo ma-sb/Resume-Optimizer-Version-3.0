@@ -1,9 +1,14 @@
-"""Read and parse .docx resume files."""
+"""Read and parse resume files (.docx, .pdf, .doc)."""
 
 import io
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 from dataclasses import dataclass, field
+
 from docx import Document
+from pypdf import PdfReader
 
 
 @dataclass
@@ -89,17 +94,81 @@ def read_docx_from_bytes(data: bytes, filename: str) -> Resume:
     return resume
 
 
+def _convert_doc_bytes_to_docx_bytes(data: bytes, filename: str) -> bytes:
+    """Convert legacy .doc bytes to .docx bytes using LibreOffice."""
+    lo_cmd = None
+    for candidate in ["libreoffice", "soffice", "/Applications/LibreOffice.app/Contents/MacOS/soffice"]:
+        if shutil.which(candidate):
+            lo_cmd = candidate
+            break
+    if not lo_cmd:
+        raise RuntimeError("LibreOffice is required to read .doc files.")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        in_path = tmp_path / filename
+        in_path.write_bytes(data)
+
+        result = subprocess.run(
+            [lo_cmd, "--headless", "--convert-to", "docx", "--outdir", str(tmp_path), str(in_path)],
+            capture_output=True,
+            timeout=60,
+        )
+        if result.returncode != 0:
+            raise RuntimeError("Failed to convert .doc file.")
+
+        out_path = tmp_path / f"{in_path.stem}.docx"
+        if not out_path.exists():
+            raise RuntimeError("Converted .docx file was not produced.")
+        return out_path.read_bytes()
+
+
+def read_pdf_from_bytes(data: bytes, filename: str) -> Resume:
+    """Parse a .pdf file from raw bytes."""
+    reader = PdfReader(io.BytesIO(data))
+    pages = [(page.extract_text() or "").strip() for page in reader.pages]
+    full_text = "\n".join(p for p in pages if p).strip()
+    if not full_text:
+        raise ValueError("No readable text found in PDF.")
+
+    first_line = next((line.strip() for line in full_text.splitlines() if line.strip()), "")
+    return Resume(
+        filepath=Path(filename),
+        filename=filename,
+        full_text=full_text,
+        sections=[],
+        name=first_line,
+        raw_bytes=None,
+    )
+
+
+def read_resume_from_bytes(data: bytes, filename: str) -> Resume:
+    """Parse a supported resume file from raw bytes."""
+    suffix = Path(filename).suffix.lower()
+    if suffix == ".docx":
+        return read_docx_from_bytes(data, filename)
+    if suffix == ".pdf":
+        return read_pdf_from_bytes(data, filename)
+    if suffix == ".doc":
+        docx_bytes = _convert_doc_bytes_to_docx_bytes(data, filename)
+        converted_name = f"{Path(filename).stem}.docx"
+        return read_docx_from_bytes(docx_bytes, converted_name)
+    raise ValueError(f"Unsupported file format: {suffix or 'unknown'}")
+
+
 def load_resumes(folder: Path) -> list[Resume]:
-    """Load all .docx resumes from a folder (recursively)."""
+    """Load all supported resumes from a folder (recursively)."""
     folder = Path(folder)
     if not folder.exists():
         return []
     resumes = []
-    for f in sorted(folder.rglob("*.docx")):
-        if f.name.startswith("~$"):
-            continue
-        try:
-            resumes.append(read_docx(f))
-        except Exception as e:
-            print(f"Warning: could not read {f.name}: {e}")
+    supported = [".docx", ".pdf", ".doc"]
+    for ext in supported:
+        for f in sorted(folder.rglob(f"*{ext}")):
+            if f.name.startswith("~$"):
+                continue
+            try:
+                resumes.append(read_resume_from_bytes(f.read_bytes(), f.name))
+            except Exception as e:
+                print(f"Warning: could not read {f.name}: {e}")
     return resumes
